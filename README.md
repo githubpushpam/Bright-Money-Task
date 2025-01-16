@@ -1,86 +1,76 @@
-Loan Management System
-This project implements a Loan Management System with features such as user registration, loan application, EMI calculation, payment handling, and credit score management. The system is built using Django and Django REST Framework (DRF).
+# Loan Management System
 
-Features
+A robust Django-based system for managing loans, including user registration, loan applications, EMI calculations, and payment processing. Built with Django REST Framework for API functionality and Celery for asynchronous task processing.
 
-User Registration:
+## Features
 
-Users can register with their Aadhar ID, name, email, and annual income.
+### User Registration
+- Register users with Aadhar ID, name, email, and annual income
+- Automatic asynchronous credit score calculation upon registration
 
-Upon successful registration, the system calculates the user's credit score asynchronously.
-
-
-
-Loan Application:
-
-Users can apply for a loan by specifying the loan type, amount, interest rate, and term period.
-
-The system validates the user's credit score and annual income before approving the loan.
-
-The system calculates the EMI schedule and ensures it does not exceed 20% of the user's monthly income.
+### Loan Application
+- Users can apply for a loan by specifying the loan type, amount, interest rate, and term period.
+- The system validates the user's credit score and annual income before approving the loan.-
+- The system calculates the EMI schedule and ensures it does not exceed 20% of the user's monthly income.
 
 
 
-Payment Processing:
+### Payment Processing
+- Streamlined EMI payment handling
+- Real-time payment validation against outstanding EMIs
 
-Users can make payments for their EMIs.
+### Loan Statement
+- Comprehensive view of loan details
+- Track payment history
+- Monitor upcoming EMI schedule
 
-Payments are validated against the current outstanding EMI.
+## Technical Stack
 
+- **Backend Framework**: Django & Django REST Framework
+- **Database**: SQLite
+- **Task Queue**: Celery with Redis message broker
+- **Key Libraries**: 
+  - Decimal (for precise financial calculations)
+  - Django Transaction Management
 
+## Database Schema
 
-Loan Statement:
+### UserInformation
+```
+- name: str
+- email: str
+- annual_income: decimal
+- aadhar_id: str (unique)
+- credit_score: int
+- user_uuid: uuid (unique)
+```
 
-Users can view their loan statements, including past payments and upcoming EMIs.
+### UserTransactionInformation
+```
+- aadhar_id: str (foreign key)
+- registration_date: datetime
+- amount: decimal
+- transaction_type: str (DEBIT/CREDIT)
+- credit_score: int
+```
 
+### LoanInfo
+```
+- loan_id: uuid (primary key)
+- user_uuid: uuid (foreign key to UserInformation)
+- loan_type: str
+- loan_amount: decimal
+- annual_interest_rate: decimal
+- term_period: int (months)
+- disbursement_date: date
+```
 
-
-Async Tasks:
-
-Credit score calculation is performed asynchronously using Celery.
-
-
-
-Tech Stack
-
-Backend: Django, Django REST Framework
-
-Database: SQLite 
-
-Task Queue: Celery (with Redis as the message broker)
-
-Python Libraries: Decimal, Django Transaction Management
-
-Database Models
-
-UserInformation:
-name: name of the user
-email: email of the user
-annual_income: annual_income of the user
-aadhar_id: aadhar_id of the user which is a unique field
-credit_score: credit score of the user
-user_uuid: unique uuid generated for each registered user
-
-UserTransactionInformation:
-aadhar_id: aadhar_id of the user
-registration_date: transaction registration date
-amount: transaction amount
-transaction_type: type of transaction either DEBIT or CREDIT
-credit_score: credit score of the user
-
-LoanInfo:
-loan_id: unique uuid generated to identify the loan
-user_uuid: uuid field which is a foreign key to UserInformation's user_uuid field
-loan_type: type of loan applied
-loan_amount: loan amount in rupees
-annual_interest_rate: annual rate of interest for the loan applied
-term_period: term period of repayment of the loan in months
-disbursement_date: date of disbursement of loan
-
-EMIDetails:
-loan_id: loan_id of the loan for which EMIs are generated which is a foreign key to LoanInfo loan_id field 
-amount_due: EMI due each month in rupees
-amount_paid: EMI paid each month in rupees
-installment_date: date of installment of EMI
+### EMIDetails
+```
+- loan_id: uuid (foreign key to LoanInfo)
+- amount_due: decimal
+- amount_paid: decimal
+- installment_date: date
+```
 
 
